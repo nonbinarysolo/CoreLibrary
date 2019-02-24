@@ -1,0 +1,2 @@
+This branch is the CoreLibrary code as of April 2011, updated to compile in Visual Studio 2017. 
+This is meant to work with the june2011 branch of Replicode. See https://github.com/IIIM-IS/replicode/blob/june2011/README.md .
