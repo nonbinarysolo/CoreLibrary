@@ -241,9 +241,16 @@ namespace	core{
 			pushCS.leave();
 		}
 
-		template<typename	T,uint32	_S>	T	PipeNN<T,_S>::pop(){
+		template<typename	T,uint32	_S>	T	PipeNN<T,_S>::pop(bool waitForItem){
 
-			Semaphore::acquire();
+			if (waitForItem)
+				Semaphore::acquire();
+			else {
+				// Use 0 timeout.
+				if (Semaphore::acquire(0))
+					// A timeout means there are no items.
+					return NULL;
+			}
 			popCS.enter();
 			T	t=Pipe11<T,_S>::_pop();
 			popCS.leave();
