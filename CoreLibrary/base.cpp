@@ -82,7 +82,16 @@
 
 namespace	core{
 
+#ifdef WITH_DEBUG_OID
+	static uint32 last_debug_oid = 0;
+#endif
+
 	_Object::_Object():refCount(0){
+#ifdef WITH_DEBUG_OID
+		_debug_oid = ++last_debug_oid;
+		if (_debug_oid == 0)
+		  int set_breakpoint_here = 1;
+#endif
 	}
 
 	_Object::~_Object(){
