@@ -315,8 +315,6 @@ namespace	core{
 		static	void		TrimLeft(std::string& str, const char* chars2remove = " ");
 		static	void		TrimRight(std::string& str, const char* chars2remove = " ");
 		static	void		ReplaceLeading(std::string& str, const char* chars2replace, char c);
-		static	std::string	Int2String(int64 i);
-		static	std::string	Uint2String(uint64 i);
 	};
 
 	class	core_dll	Random{

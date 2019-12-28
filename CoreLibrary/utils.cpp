@@ -400,11 +400,11 @@ namespace	core{
 		uint64	s=ms/1000;
 		ms=ms%1000;
 
-		std::string	_s=String::Uint2String(s);
+		std::string	_s=std::to_string(s);
 		_s+="s:";
-		_s+=String::Uint2String(ms);
+		_s+=std::to_string(ms);
 		_s+="ms:";
-		_s+=String::Uint2String(us);
+		_s+=std::to_string(us);
 		_s+="us";
 
 		return	_s;
@@ -426,9 +426,9 @@ namespace	core{
 		_s.erase(_s.length()-6,5);
 		std::string	hh_mm_ss=_s.substr(_s.length()-9,8);
 		hh_mm_ss+=":";
-		hh_mm_ss+=String::Uint2String(ms);
+		hh_mm_ss+=std::to_string(ms);
 		hh_mm_ss+=":";
-		hh_mm_ss+=String::Uint2String(us);
+		hh_mm_ss+=std::to_string(us);
 
 		_s.erase(_s.length()-9,9);
 		_s+=year;
@@ -1207,18 +1207,6 @@ namespace	core{
 				str.replace(str.begin(),str.end()-1,n-1,c);
 			}
 		}
-	}
-
-	std::string	String::Int2String(int64 i) {
-		char buffer[1024];
-		sprintf(buffer,"%d",i);
-		return std::string(buffer);
-	}
-
-	std::string	String::Uint2String(uint64 i) {
-		char buffer[1024];
-		sprintf(buffer,"%u",i);
-		return std::string(buffer);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
