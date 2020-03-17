@@ -103,7 +103,7 @@ public:
   C *operator ->() const;
   template<class D> operator D *() const {
 
-    return (D *)object;
+    return static_cast<D *>((C *)object);
   }
   bool operator ==(C *c) const;
   bool operator !=(C *c) const;
