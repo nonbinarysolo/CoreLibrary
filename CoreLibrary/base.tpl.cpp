@@ -142,7 +142,7 @@ template<class C> inline P<C>& P<C>::operator =(C *c) {
 
 template<class C> template<class D> inline P<C> &P<C>::operator =(const P<D> &p) {
 
-  return this->operator =((C *)p.object);
+  return this->operator =(static_cast<C *>((D *)p.object));
 }
 
 template<class C> inline P<C> &P<C>::operator =(const P<C> &p) {
