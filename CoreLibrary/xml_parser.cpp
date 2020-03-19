@@ -91,7 +91,7 @@
 #include <stdlib.h>
 #include "types.h"
 
-namespace	core{
+namespace core{
 
 XMLCSTR XMLNode::getVersion() { return _X("v2.30"); }
 void freeXMLString(XMLSTR t){free(t);}
@@ -444,7 +444,7 @@ static const char XML_sjisByteTable[256] =
     2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,// 0x90
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,// 0xa0
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,// 0xb0
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,// 0xc0 
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,// 0xc0
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,// 0xd0
     2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,// 0xe0 0xe0 to 0xef 2 bytes
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 // 0xf0
@@ -530,12 +530,12 @@ XMLError XMLNode::writeToFile(XMLCSTR filename, const char *encoding, char nForm
             unsigned char h[3]={0xEF,0xBB,0xBF}; if (!fwrite(h,3,1,f)) return eXMLErrorCannotWriteFile;
             encoding="utf-8";
         } else if (characterEncoding==encoding_ShiftJIS) encoding="SHIFT-JIS";
-        
+
         if (!encoding) encoding="ISO-8859-1";
         if (fprintf(f,"<?xml version=\"1.0\" encoding=\"%s\"?>\n",encoding)<0) return eXMLErrorCannotWriteFile;
     } else
     {
-        if (characterEncoding==encoding_UTF8) 
+        if (characterEncoding==encoding_UTF8)
         {
             unsigned char h[3]={0xEF,0xBB,0xBF}; if (!fwrite(h,3,1,f)) return eXMLErrorCannotWriteFile;
         }
@@ -2035,21 +2035,21 @@ void XMLNode::deleteNodeContent_priv(char isInDestuctor, char force)
         int i;
         if (d->pParent) detachFromParent(d);
         for(i=0; i<d->nChild; i++) { d->pChild[i].d->pParent=NULL; d->pChild[i].deleteNodeContent_priv(1,force); }
-        myFree(d->pChild); 
+        myFree(d->pChild);
         for(i=0; i<d->nText; i++) free((void*)d->pText[i]);
-        myFree(d->pText); 
+        myFree(d->pText);
         for(i=0; i<d->nClear; i++) free((void*)d->pClear[i].lpszValue);
-        myFree(d->pClear); 
+        myFree(d->pClear);
         for(i=0; i<d->nAttribute; i++)
         {
             free((void*)d->pAttribute[i].lpszName);
             if (d->pAttribute[i].lpszValue) free((void*)d->pAttribute[i].lpszValue);
         }
-        myFree(d->pAttribute); 
-        myFree(d->pOrder); 
+        myFree(d->pAttribute);
+        myFree(d->pOrder);
         myFree((void*)d->lpszName);
-        d->nChild=0;    d->nText=0;    d->nClear=0;    d->nAttribute=0; 
-        d->pChild=NULL; d->pText=NULL; d->pClear=NULL; d->pAttribute=NULL; 
+        d->nChild=0;    d->nText=0;    d->nClear=0;    d->nAttribute=0;
+        d->pChild=NULL; d->pText=NULL; d->pClear=NULL; d->pAttribute=NULL;
         d->pOrder=NULL; d->lpszName=NULL; d->pParent=NULL;
     }
     if (d->ref_count==0)
@@ -2486,10 +2486,10 @@ XMLNode::XMLCharEncoding XMLNode::guessCharEncoding(void *buf,int l, char useXML
     if (!b) return bestGuess;
     b+=8; while XML_isSPACECHAR(*b) b++; if (*b!='=') return bestGuess;
     b++;  while XML_isSPACECHAR(*b) b++; if ((*b!='\'')&&(*b!='"')) return bestGuess;
-    b++;  while XML_isSPACECHAR(*b) b++; 
-    
+    b++;  while XML_isSPACECHAR(*b) b++;
+
     if ((_strnicmp((char*)b,"utf-8",5)==0)||
-        (_strnicmp((char*)b,"utf8",4)==0)) 
+        (_strnicmp((char*)b,"utf8",4)==0))
     {
         if (bestGuess==encoding_ascii) return (XMLCharEncoding)0;
         return encoding_UTF8;
@@ -2498,7 +2498,7 @@ XMLNode::XMLCharEncoding XMLNode::guessCharEncoding(void *buf,int l, char useXML
     if ((_strnicmp((char*)b,"shiftjis",8)==0)||
         (_strnicmp((char*)b,"shift-jis",9)==0)||
         (_strnicmp((char*)b,"sjis",4)==0)) return encoding_ShiftJIS;
-    
+
     return encoding_ascii;
 #endif
 }
