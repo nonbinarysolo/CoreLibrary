@@ -177,7 +177,6 @@ private:
 public:
   void set();    // initialize
   void  check(); // gets the cpu count elapsed between set() and check()
-  uint64 us();   // converts cpu counts in us
 };
 
 class core_dll Time { // TODO: make sure time stamps are consistent when computed by different cores
@@ -249,7 +248,6 @@ public:
   ~Timer();
   void start(uint64 deadline, uint32 period = 0);   // deadline in us, period in ms.
   bool wait(uint32 timeout = Infinite);            // timeout in ms; returns true if timedout.
-  bool wait(uint64 &us, uint32 timeout = Infinite); // idem; updates the us actually spent.
 };
 
 class core_dll Event {

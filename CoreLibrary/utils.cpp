@@ -332,11 +332,6 @@ void TimeProbe::check() {
   cpu_counts = getCounts() - cpu_counts;
 }
 
-uint64 TimeProbe::us() {
-
-  return (uint64)(cpu_counts*Time::Period);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if defined WINDOWS
@@ -714,16 +709,6 @@ bool Timer::wait(uint32 timeout) {
   pthread_mutex_unlock(&sematex.mutex);
   return res;
 #endif
-}
-
-bool Timer::wait(uint64 &us, uint32 timeout) {
-
-  TimeProbe probe;
-  probe.set();
-  bool r = wait((uint64)timeout);
-  probe.check();
-  us = probe.us();
-  return r;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
