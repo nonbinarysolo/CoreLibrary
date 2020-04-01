@@ -77,6 +77,8 @@
 
 #include "utils.h"
 
+using namespace std::chrono;
+
 #if defined WINDOWS
 #include <intrin.h>
 #pragma intrinsic (_InterlockedDecrement)
@@ -242,9 +244,9 @@ void Thread::Wait(Thread *_thread) {
 #endif
 }
 
-void Thread::Sleep(int64 ms) {
+void Thread::Sleep(milliseconds ms) {
 #if defined WINDOWS
-  ::Sleep((uint32)ms);
+  ::Sleep((uint32)ms.count());
 #elif defined LINUX
   // we are actually being passed millisecond, so multiply up
   usleep(ms * 1000);
@@ -345,7 +347,7 @@ bool NtSetTimerResolution(IN ULONG RequestedResolution, IN BOOLEAN Set, OUT PULO
 
 float64 Time::Period;
 
-int64 Time::InitTime;
+Timestamp Time::InitTime;
 
 void Time::Init(uint32 r) {
 #if defined WINDOWS
@@ -363,32 +365,25 @@ void Time::Init(uint32 r) {
   Period = 1000000.0 / f.QuadPart; // in us
   struct _timeb local_time;
   _ftime(&local_time);
-  InitTime = (int64)(local_time.time * 1000 + local_time.millitm) * 1000; // in us
+  InitTime = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
 #elif defined LINUX
-  // we are actually setup a timer resolution of 1ms
-  // we can simulate this by performing a gettimeofday call
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  InitTime = (((int64)tv.tv_sec) * 1000000) + (int64)tv.tv_usec;
-  Period = 1; // we measure all time in us anyway, so conversion is 1-to-1
+  // The steady_clock in Get() may not start at zero, so subtract it initially.
+  InitTime = system_clock::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 #endif
 }
 
-uint64 Time::Get() {
+Timestamp Time::Get() {
 #if defined WINDOWS
   LARGE_INTEGER counter;
   QueryPerformanceCounter(&counter);
-  return (uint64)(InitTime + counter.QuadPart*Period);
+  return InitTime + microseconds((uint64)(counter.QuadPart*Period));
 #elif defined LINUX
-  timeval perfCount;
-  struct timezone tmzone;
-  gettimeofday(&perfCount, &tmzone);
-  int64 r = (((int64)perfCount.tv_sec) * 1000000) + (int64)perfCount.tv_usec;
-  return r;
+  return InitTime + duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 #endif
 }
 
-std::string Time::ToString_seconds(uint64 t) {
+std::string Time::ToString_seconds(Timestamp::duration duration) {
+  uint64 t = duration_cast<microseconds>(duration).count();
 
   uint64 us = t % 1000;
   uint64 ms = t / 1000;
@@ -405,7 +400,8 @@ std::string Time::ToString_seconds(uint64 t) {
   return _s;
 }
 
-std::string Time::ToString_year(uint64 t) {
+std::string Time::ToString_year(Timestamp timestamp) {
+  uint64 t = duration_cast<microseconds>(timestamp.time_since_epoch()).count();
 
   uint64 us = t % 1000;
   uint64 ms = t / 1000;
@@ -659,10 +655,10 @@ Timer::~Timer() {
 #endif
 }
 
-void Timer::start(uint64 deadline, uint32 period) {
+void Timer::start(microseconds deadline, uint32 period) {
 #if defined WINDOWS
   LARGE_INTEGER _deadline; // in 100 ns intervals
-  _deadline.QuadPart = -10LL * deadline; // negative means relative
+  _deadline.QuadPart = -10LL * deadline.count(); // negative means relative
   bool r = SetWaitableTimer(t, &_deadline, (long)period, NULL, NULL, 0);
   if (!r) {
     printf("Error arming timer\n");
@@ -671,7 +667,7 @@ void Timer::start(uint64 deadline, uint32 period) {
   struct itimerspec newtv;
   sigset_t allsigs;
 
-  uint64 t = deadline;
+  uint64 t = deadline.count();
   uint64 p = period * 1000;
   newtv.it_interval.tv_sec = p / 1000000;
   newtv.it_interval.tv_nsec = (p % 1000000) * 1000;

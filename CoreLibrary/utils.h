@@ -161,7 +161,8 @@ public:
   static void TerminateAndWait(Thread *_thread);
   static void Wait(Thread **threads, uint32 threadCount);
   static void Wait(Thread *_thread);
-  static void Sleep(int64 ms);
+  static void Sleep(std::chrono::milliseconds ms);
+  static void Sleep(std::chrono::system_clock::duration ms) { Sleep(std::chrono::duration_cast<std::chrono::milliseconds>(ms)); }
   static void Sleep(); // inifnite
   virtual ~Thread();
   void start(thread_function f);
@@ -183,13 +184,13 @@ class core_dll Time { // TODO: make sure time stamps are consistent when compute
   friend class TimeProbe;
 private:
   static float64 Period;
-  static int64 InitTime;
+  static Timestamp InitTime;
 public:
   static void Init(uint32 r); // detects the hardware timing capabilities; r: time resolution in us (on windows xp: max ~1000; use 1000, 2000, 5000 or 10000)
-  static uint64 Get();        // in us since 01/01/1970
+  static Timestamp Get();     // timestamp since 01/01/1970
 
-  static std::string ToString_seconds(uint64 t); // seconds:milliseconds:microseconds since 01/01/1970.
-  static std::string ToString_year(uint64 t);    // day_name day_number month year hour:minutes:seconds:milliseconds:microseconds GMT since 01/01/1970.
+  static std::string ToString_seconds(Timestamp::duration duration); // seconds:milliseconds:microseconds.
+  static std::string ToString_year(Timestamp timestamp);    // day_name day_number month year hour:minutes:seconds:milliseconds:microseconds GMT since 01/01/1970.
 };
 
 class core_dll Host {
@@ -246,7 +247,7 @@ protected:
 public:
   Timer();
   ~Timer();
-  void start(uint64 deadline, uint32 period = 0);   // deadline in us, period in ms.
+  void start(std::chrono::microseconds deadline, uint32 period = 0);   // deadline in us, period in ms.
   bool wait(uint32 timeout = Infinite);            // timeout in ms; returns true if timedout.
 };
 
