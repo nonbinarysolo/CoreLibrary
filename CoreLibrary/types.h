@@ -79,6 +79,7 @@
 #define core_types_h
 
 #include <cstddef>
+#include <chrono>
 
 #if defined(WIN32)
 #define WINDOWS
@@ -192,6 +193,9 @@ typedef double float64;
 
 typedef word32 word;
 typedef word16 half_word;
+
+// Even though Time::Get() uses a "steady clock", it returns the time since 01/01/1970, so use system_clock.
+typedef std::chrono::system_clock::time_point Timestamp;
 
 #if defined WINDOWS
 typedef long int32;
