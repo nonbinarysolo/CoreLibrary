@@ -155,23 +155,23 @@ SharedLibrary *SharedLibrary::New(const char *fileName) {
   }
 }
 
-SharedLibrary::SharedLibrary() : library(NULL) {
+SharedLibrary::SharedLibrary() : library_(NULL) {
 }
 
 SharedLibrary::~SharedLibrary() {
 #if defined WINDOWS
-  if (library)
-    FreeLibrary(library);
+  if (library_)
+    FreeLibrary(library_);
 #elif defined LINUX
-  if (library)
-    dlclose(library);
+  if (library_)
+    dlclose(library_);
 #endif
 }
 
 SharedLibrary *SharedLibrary::load(const char *fileName) {
 #if defined WINDOWS
-  library = LoadLibrary(TEXT(fileName));
-  if (!library) {
+  library_ = LoadLibrary(TEXT(fileName));
+  if (!library_) {
 
     DWORD error = GetLastError();
     std::cerr << "> Error: unable to load shared library " << fileName << " :" << error << std::endl;
@@ -191,8 +191,8 @@ SharedLibrary *SharedLibrary::load(const char *fileName) {
   if (strstr(fileName + (strlen(fileName) - 3), ".so") == NULL) {
     strcat(libraryName, ".so");
   }
-  library = dlopen(libraryName, RTLD_NOW | RTLD_GLOBAL);
-  if (!library) {
+  library_ = dlopen(libraryName, RTLD_NOW | RTLD_GLOBAL);
+  if (!library_) {
     std::cout << "> Error: unable to load shared library " << fileName << " :" << dlerror() << std::endl;
     free(libraryName);
     return NULL;
@@ -213,11 +213,11 @@ void Thread::TerminateAndWait(Thread **threads, uint32 threadCount) {
   }
 }
 
-void Thread::TerminateAndWait(Thread *_thread) {
-  if (!_thread)
+void Thread::TerminateAndWait(Thread *thread) {
+  if (!thread)
     return;
-  _thread->terminate();
-  Thread::Wait(_thread);
+  thread->terminate();
+  Thread::Wait(thread);
 }
 
 void Thread::Wait(Thread **threads, uint32 threadCount) {
@@ -226,21 +226,21 @@ void Thread::Wait(Thread **threads, uint32 threadCount) {
     return;
 #if defined WINDOWS
   for (uint32 i = 0; i < threadCount; i++)
-    WaitForSingleObject(threads[i]->_thread, INFINITE);
+    WaitForSingleObject(threads[i]->thread_, INFINITE);
 #elif defined LINUX
   for (uint32 i = 0; i < threadCount; i++)
-    pthread_join(threads[i]->_thread, NULL);
+    pthread_join(threads[i]->thread_, NULL);
 #endif
 }
 
-void Thread::Wait(Thread *_thread) {
+void Thread::Wait(Thread *thread) {
 
-  if (!_thread)
+  if (!thread)
     return;
 #if defined WINDOWS
-  WaitForSingleObject(_thread->_thread, INFINITE);
+  WaitForSingleObject(thread->thread_, INFINITE);
 #elif defined LINUX
-  pthread_join(_thread->_thread, NULL);
+  pthread_join(thread->thread_, NULL);
 #endif
 }
 
@@ -262,50 +262,50 @@ void Thread::Sleep() {
 #endif
 }
 
-Thread::Thread() : is_meaningful(false) {
-  _thread = NULL;
+Thread::Thread() : is_meaningful_(false) {
+  thread_ = NULL;
 }
 
 Thread::~Thread() {
 #if defined WINDOWS
   // ExitThread(0);
-  if (is_meaningful)
-    CloseHandle(_thread);
+  if (is_meaningful_)
+    CloseHandle(thread_);
 #elif defined LINUX
-  // delete(_thread);
+  // delete(thread_);
 #endif
 }
 
 void Thread::start(thread_function f) {
 #if defined WINDOWS
-  _thread = CreateThread(NULL, 65536, f, this, 0, NULL); // 64KB: minimum initial stack size
+  thread_ = CreateThread(NULL, 65536, f, this, 0, NULL); // 64KB: minimum initial stack size
 #elif defined LINUX
-  pthread_create(&_thread, NULL, f, this);
+  pthread_create(&thread_, NULL, f, this);
 #endif
-  is_meaningful = true;
+  is_meaningful_ = true;
 }
 
 void Thread::suspend() {
 #if defined WINDOWS
-  SuspendThread(_thread);
+  SuspendThread(thread_);
 #elif defined LINUX
-  pthread_kill(_thread, SIGSTOP);
+  pthread_kill(thread_, SIGSTOP);
 #endif
 }
 
 void Thread::resume() {
 #if defined WINDOWS
-  ResumeThread(_thread);
+  ResumeThread(thread_);
 #elif defined LINUX
-  pthread_kill(_thread, SIGCONT);
+  pthread_kill(thread_, SIGCONT);
 #endif
 }
 
 void Thread::terminate() {
 #if defined WINDOWS
-  TerminateThread(_thread, 0);
+  TerminateThread(thread_, 0);
 #elif defined LINUX
-  pthread_cancel(_thread);
+  pthread_cancel(thread_);
 #endif
 }
 
@@ -313,7 +313,7 @@ void Thread::terminate() {
 
 void TimeProbe::set() {
 
-  cpu_counts = getCounts();
+  cpu_counts_ = getCounts();
 }
 
 int64 TimeProbe::getCounts() {
@@ -331,7 +331,7 @@ int64 TimeProbe::getCounts() {
 
 void TimeProbe::check() {
 
-  cpu_counts = getCounts() - cpu_counts;
+  cpu_counts_ = getCounts() - cpu_counts_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,9 +345,9 @@ bool NtSetTimerResolution(IN ULONG RequestedResolution, IN BOOLEAN Set, OUT PULO
   // TODO
 #endif
 
-float64 Time::Period;
+float64 Time::Period_;
 
-Timestamp Time::InitTime;
+Timestamp Time::InitTime_;
 
 void Time::Init(uint32 r) {
 #if defined WINDOWS
@@ -362,13 +362,13 @@ void Time::Init(uint32 r) {
   }
   LARGE_INTEGER f;
   QueryPerformanceFrequency(&f);
-  Period = 1000000.0 / f.QuadPart; // in us
+  Period_ = 1000000.0 / f.QuadPart; // in us
   struct _timeb local_time;
   _ftime(&local_time);
-  InitTime = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
+  InitTime_ = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
 #elif defined LINUX
   // The steady_clock in Get() may not start at zero, so subtract it initially.
-  InitTime = system_clock::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
+  InitTime_ = system_clock::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 #endif
 }
 
@@ -376,9 +376,9 @@ Timestamp Time::Get() {
 #if defined WINDOWS
   LARGE_INTEGER counter;
   QueryPerformanceCounter(&counter);
-  return InitTime + microseconds((uint64)(counter.QuadPart*Period));
+  return InitTime_ + microseconds((uint64)(counter.QuadPart * Period_));
 #elif defined LINUX
-  return InitTime + duration_cast<microseconds>(steady_clock::now().time_since_epoch());
+  return InitTime_ + duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 #endif
 }
 
@@ -460,40 +460,40 @@ const uint32 Semaphore::Infinite = INT_MAX;
 
 Semaphore::Semaphore(uint32 initialCount, uint32 maxCount) {
 #if defined WINDOWS
-  s = CreateSemaphore(NULL, initialCount, maxCount, NULL);
+  s_ = CreateSemaphore(NULL, initialCount, maxCount, NULL);
 #elif defined LINUX
-  sem_init(&s, 0, initialCount);
+  sem_init(&s_, 0, initialCount);
 #endif
 }
 
 Semaphore::~Semaphore() {
 #if defined WINDOWS
-  CloseHandle(s);
+  CloseHandle(s_);
 #elif defined LINUX
-  sem_destroy(&s);
+  sem_destroy(&s_);
 #endif
 }
 
 bool Semaphore::acquire(uint32 timeout) {
 #if defined WINDOWS
-  uint32 r = WaitForSingleObject(s, timeout);
+  uint32 r = WaitForSingleObject(s_, timeout);
   return r == WAIT_TIMEOUT;
 #elif defined LINUX
   struct timespec t;
   int r;
 
   CalcTimeout(t, timeout);
-  r = sem_timedwait(&s, &t);
+  r = sem_timedwait(&s_, &t);
   return r == 0;
 #endif
 }
 
 void Semaphore::release(uint32 count) {
 #if defined WINDOWS
-  ReleaseSemaphore(s, count, NULL);
+  ReleaseSemaphore(s_, count, NULL);
 #elif defined LINUX
   for (uint32 c = 0; c < count; c++)
-    sem_post(&s);
+    sem_post(&s_);
 #endif
 }
 
@@ -526,29 +526,29 @@ const uint32 Mutex::Infinite = INT_MAX;
 
 Mutex::Mutex() {
 #if defined WINDOWS
-  m = CreateMutex(NULL, false, NULL);
+  m_ = CreateMutex(NULL, false, NULL);
 #elif defined LINUX
-  pthread_mutex_init(&m, NULL);
+  pthread_mutex_init(&m_, NULL);
 #endif
 }
 
 Mutex::~Mutex() {
 #if defined WINDOWS
-  CloseHandle(m);
+  CloseHandle(m_);
 #elif defined LINUX
-  pthread_mutex_destroy(&m);
+  pthread_mutex_destroy(&m_);
 #endif
 }
 
 bool Mutex::acquire(uint32 timeout) {
 #if defined WINDOWS
-  uint32 r = WaitForSingleObject(m, timeout);
+  uint32 r = WaitForSingleObject(m_, timeout);
   return r == WAIT_TIMEOUT;
 #elif defined LINUX
   int64 start = Time::Get();
   int64 uTimeout = timeout * 1000;
 
-  while (pthread_mutex_trylock(&m) != 0) {
+  while (pthread_mutex_trylock(&m_) != 0) {
     Thread::Sleep(10);
     if (Time::Get() - start >= uTimeout)
       return false;
@@ -560,9 +560,9 @@ bool Mutex::acquire(uint32 timeout) {
 
 void Mutex::release() {
 #if defined WINDOWS
-  ReleaseMutex(m);
+  ReleaseMutex(m_);
 #elif defined LINUX
-  pthread_mutex_unlock(&m);
+  pthread_mutex_unlock(&m_);
 #endif
 }
 
@@ -570,33 +570,33 @@ void Mutex::release() {
 
 CriticalSection::CriticalSection() {
 #if defined WINDOWS
-  InitializeCriticalSection(&cs);
+  InitializeCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_init(&cs, NULL);
+  pthread_mutex_init(&CS, NULL);
 #endif
 }
 
 CriticalSection::~CriticalSection() {
 #if defined WINDOWS
-  DeleteCriticalSection(&cs);
+  DeleteCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_destroy(&cs);
+  pthread_mutex_destroy(&CS);
 #endif
 }
 
 void CriticalSection::enter() {
 #if defined WINDOWS
-  EnterCriticalSection(&cs);
+  EnterCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_lock(&cs);
+  pthread_mutex_lock(&CS);
 #endif
 }
 
 void CriticalSection::leave() {
 #if defined WINDOWS
-  LeaveCriticalSection(&cs);
+  LeaveCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_unlock(&cs);
+  pthread_mutex_unlock(&CS);
 #endif
 }
 
@@ -619,8 +619,8 @@ static void timer_signal_handler(int sig, siginfo_t *siginfo, void *context) {
 
 Timer::Timer() {
 #if defined WINDOWS
-  t = CreateWaitableTimer(NULL, false, NULL);
-  if (t == NULL) {
+  t_ = CreateWaitableTimer(NULL, false, NULL);
+  if (t_ == NULL) {
     printf("Error creating timer\n");
   }
 #elif defined LINUX
@@ -647,7 +647,7 @@ Timer::Timer() {
 
 Timer::~Timer() {
 #if defined WINDOWS
-  CloseHandle(t);
+  CloseHandle(t_);
 #elif defined LINUX
   pthread_cond_destroy(&sematex.semaphore);
   pthread_mutex_destroy(&sematex.mutex);
@@ -659,7 +659,7 @@ void Timer::start(microseconds deadline, uint32 period) {
 #if defined WINDOWS
   LARGE_INTEGER _deadline; // in 100 ns intervals
   _deadline.QuadPart = -10LL * deadline.count(); // negative means relative
-  bool r = SetWaitableTimer(t, &_deadline, (long)period, NULL, NULL, 0);
+  bool r = SetWaitableTimer(t_, &_deadline, (long)period, NULL, NULL, 0);
   if (!r) {
     printf("Error arming timer\n");
   }
@@ -668,7 +668,7 @@ void Timer::start(microseconds deadline, uint32 period) {
   sigset_t allsigs;
 
   uint64 t = deadline.count();
-  uint64 p = period * 1000;
+  uint64 p = period_ * 1000;
   newtv.it_interval.tv_sec = p / 1000000;
   newtv.it_interval.tv_nsec = (p % 1000000) * 1000;
   newtv.it_value.tv_sec = t / 1000000;
@@ -688,7 +688,7 @@ void Timer::start(microseconds deadline, uint32 period) {
 
 bool Timer::wait(uint32 timeout) {
 #if defined WINDOWS
-  uint32 r = WaitForSingleObject(t, timeout);
+  uint32 r = WaitForSingleObject(t_, timeout);
   return r == WAIT_TIMEOUT;
 #elif defined LINUX
   bool res;
@@ -711,7 +711,7 @@ bool Timer::wait(uint32 timeout) {
 
 Event::Event() {
 #if defined WINDOWS
-  e = CreateEvent(NULL, true, false, NULL);
+  e_ = CreateEvent(NULL, true, false, NULL);
 #elif defined LINUX
   // TODO.
 #endif
@@ -719,7 +719,7 @@ Event::Event() {
 
 Event::~Event() {
 #if defined WINDOWS
-  CloseHandle(e);
+  CloseHandle(e_);
 #elif defined LINUX
   // TODO.
 #endif
@@ -727,7 +727,7 @@ Event::~Event() {
 
 void Event::wait() {
 #if defined WINDOWS
-  WaitForSingleObject(e, INFINITE);
+  WaitForSingleObject(e_, INFINITE);
 #elif defined LINUX
   // TODO.
 #endif
@@ -735,7 +735,7 @@ void Event::wait() {
 
 void Event::fire() {
 #if defined WINDOWS
-  SetEvent(e);
+  SetEvent(e_);
 #elif defined LINUX
   // TODO.
 #endif
@@ -743,7 +743,7 @@ void Event::fire() {
 
 void Event::reset() {
 #if defined WINDOWS
-  ResetEvent(e);
+  ResetEvent(e_);
 #elif defined LINUX
   // TODO.
 #endif
@@ -884,7 +884,7 @@ uint8 BSR(word data) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-FastSemaphore::FastSemaphore(uint32 initialCount, uint32 maxCount) : Semaphore(initialCount > 0 ? 1 : 0, 1), count(initialCount), maxCount(maxCount) {
+FastSemaphore::FastSemaphore(uint32 initialCount, uint32 maxCount) : Semaphore(initialCount > 0 ? 1 : 0, 1), count_(initialCount), maxCount_(maxCount) {
 }
 
 FastSemaphore::~FastSemaphore() {
@@ -893,21 +893,21 @@ FastSemaphore::~FastSemaphore() {
 void FastSemaphore::acquire() {
 
   int32 c;
-  while ((c = Atomic::Decrement32(&count)) >= maxCount); // release calls can bring count over maxCount: acquire has to exhaust these extras
+  while ((c = Atomic::Decrement32(&count_)) >= maxCount_); // release calls can bring count over maxCount_: acquire has to exhaust these extras
   if (c < 0)
     Semaphore::acquire();
 }
 
 void FastSemaphore::release() {
 
-  int32 c = Atomic::Increment32(&count);
+  int32 c = Atomic::Increment32(&count_);
   if (c <= 0)
     Semaphore::release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-  FastMutex::FastMutex(uint32 initialCount):Semaphore(initialCount,1),count(initialCount){
+  FastMutex::FastMutex(uint32 initialCount):Semaphore(initialCount,1),count_(initialCount){
   }
 
   FastMutex::~FastMutex(){
@@ -915,14 +915,14 @@ void FastSemaphore::release() {
 
   void FastMutex::acquire(){
 
-    int32 former=Atomic::Swap32(&count,0);
+    int32 former=Atomic::Swap32(&count_,0);
     if(former==0)
       Semaphore::acquire();
   }
 
   void FastMutex::release(){
 
-    int32 former=Atomic::Swap32(&count,1);
+    int32 former=Atomic::Swap32(&count_,1);
     if(former==0)
       Semaphore::release();
   }
@@ -1192,10 +1192,10 @@ void String::ReplaceLeading(std::string& str, const char* chars2replace, char c)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-int32 Random::r250_index;
-int32 Random::r521_index;
-uint32 Random::r250_buffer[R250_LEN];
-uint32 Random::r521_buffer[R521_LEN];
+int32 Random::r250_index_;
+int32 Random::r521_index_;
+uint32 Random::r250_buffer_[R250_LEN];
+uint32 Random::r521_buffer_[R521_LEN];
 
 void Random::Init() {
 
@@ -1204,26 +1204,26 @@ void Random::Init() {
   uint32 mask2 = 0xFFFFFFFF;
 
   while (i-- > R250_LEN)
-    r521_buffer[i] = rand();
+    r521_buffer_[i] = rand();
   while (i-- > 31) {
 
-    r250_buffer[i] = rand();
-    r521_buffer[i] = rand();
+    r250_buffer_[i] = rand();
+    r521_buffer_[i] = rand();
   }
 
   // Establish linear independence of the bit columns
   // by setting the diagonal bits and clearing all bits above
   while (i-- > 0) {
 
-    r250_buffer[i] = (rand() | mask1) & mask2;
-    r521_buffer[i] = (rand() | mask1) & mask2;
+    r250_buffer_[i] = (rand() | mask1) & mask2;
+    r521_buffer_[i] = (rand() | mask1) & mask2;
     mask2 ^= mask1;
     mask1 >>= 1;
   }
-  r250_buffer[0] = mask1;
-  r521_buffer[0] = mask2;
-  r250_index = 0;
-  r521_index = 0;
+  r250_buffer_[0] = mask1;
+  r521_buffer_[0] = mask2;
+  r250_index_ = 0;
+  r521_index_ = 0;
 }
 
 float32 Random::operator ()(uint32 range) {
@@ -1238,10 +1238,10 @@ float32 Random::operator ()(uint32 range) {
   increased perf by another 10%.
   */
 
-  int32 i1 = r250_index;
-  int32 i2 = r521_index;
-  uint8 *b1 = (uint8 *)r250_buffer;
-  uint8 *b2 = (uint8 *)r521_buffer;
+  int32 i1 = r250_index_;
+  int32 i2 = r521_index_;
+  uint8 *b1 = (uint8 *)r250_buffer_;
+  uint8 *b2 = (uint8 *)r521_buffer_;
   uint32 *tmp1, *tmp2;
   uint32 r, s;
   int32 j1, j2;
@@ -1261,9 +1261,9 @@ float32 Random::operator ()(uint32 range) {
   *tmp2 = s;
 
   i1 = (i1 != sizeof(uint32)*(R250_LEN - 1)) ? (i1 + sizeof(uint32)) : 0;
-  r250_index = i1;
+  r250_index_ = i1;
   i2 = (i2 != sizeof(uint32)*(R521_LEN - 1)) ? (i2 + sizeof(uint32)) : 0;
-  r521_index = i2;
+  r521_index_ = i2;
 
   float32 _r = r ^ s;
   //return range*(_r/((float32)ULONG_MAX));
