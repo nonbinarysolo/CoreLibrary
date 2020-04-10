@@ -365,7 +365,10 @@ void Time::Init(uint32 r) {
   Period_ = 1000000.0 / f.QuadPart; // in us
   struct _timeb local_time;
   _ftime(&local_time);
-  InitTime_ = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
+  auto now = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
+  // The QueryPerformanceCounter in Get() may not start at zero, so subtract it initially.
+  InitTime_ = Timestamp(seconds(0));
+  InitTime_ = now - Get().time_since_epoch();
 #elif defined LINUX
   // The steady_clock in Get() may not start at zero, so subtract it initially.
   InitTime_ = system_clock::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
