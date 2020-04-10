@@ -140,7 +140,7 @@ struct SemaTex {
 
 class core_dll SharedLibrary {
 private:
-  shared_object library;
+  shared_object library_;
 public:
   static SharedLibrary *New(const char *fileName);
   SharedLibrary();
@@ -151,16 +151,16 @@ public:
 
 class core_dll Thread {
 private:
-  thread _thread;
-  bool is_meaningful;
+  thread thread_;
+  bool is_meaningful_;
 protected:
   Thread();
 public:
   template<class T> static T *New(thread_function f, void *args);
   static void TerminateAndWait(Thread **threads, uint32 threadCount);
-  static void TerminateAndWait(Thread *_thread);
+  static void TerminateAndWait(Thread *thread);
   static void Wait(Thread **threads, uint32 threadCount);
-  static void Wait(Thread *_thread);
+  static void Wait(Thread *thread);
   static void Sleep(std::chrono::milliseconds ms);
   static void Sleep(std::chrono::system_clock::duration ms) { Sleep(std::chrono::duration_cast<std::chrono::milliseconds>(ms)); }
   static void Sleep(); // inifnite
@@ -173,7 +173,7 @@ public:
 
 class core_dll TimeProbe { // requires Time::Init()
 private:
-  int64 cpu_counts;
+  int64 cpu_counts_;
   int64 getCounts();
 public:
   void set();    // initialize
@@ -183,8 +183,8 @@ public:
 class core_dll Time { // TODO: make sure time stamps are consistent when computed by different cores
   friend class TimeProbe;
 private:
-  static float64 Period;
-  static Timestamp InitTime;
+  static float64 Period_;
+  static Timestamp InitTime_;
 public:
   static void Init(uint32 r); // detects the hardware timing capabilities; r: time resolution in us (on windows xp: max ~1000; use 1000, 2000, 5000 or 10000)
   static Timestamp Get();     // timestamp since 01/01/1970
@@ -201,7 +201,7 @@ public:
 
 class core_dll Semaphore {
 private:
-  semaphore s;
+  semaphore s_;
 protected:
   static const uint32 Infinite;
 public:
@@ -214,7 +214,7 @@ public:
 
 class core_dll Mutex {
 private:
-  mutex m;
+  mutex m_;
 protected:
   static const uint32 Infinite;
 public:
@@ -226,7 +226,7 @@ public:
 
 class core_dll CriticalSection {
 private:
-  critical_section cs;
+  critical_section cs_;
 public:
   CriticalSection();
   ~CriticalSection();
@@ -237,7 +237,7 @@ public:
 class core_dll Timer {
 private:
 #if defined WINDOWS
-  timer t;
+  timer t_;
 #elif defined LINUX
   timer_t timer;
   struct SemaTex sematex;
@@ -254,7 +254,7 @@ public:
 class core_dll Event {
 private:
 #if defined WINDOWS
-  event e;
+  event e_;
 #elif defined LINUX
   // TODO.
 #endif
@@ -295,8 +295,8 @@ uint8 core_dll BSR(word data); // BitScanReverse
 class core_dll FastSemaphore : // lock-free under no contention
   public Semaphore {
 private:
-  int32 volatile count; // minus the number of waiting threads
-  const int32 maxCount; // max number of threads allowed to run
+  int32 volatile count_; // minus the number of waiting threads
+  const int32 maxCount_; // max number of threads allowed to run
 public:
   FastSemaphore(uint32 initialCount, uint32 maxCount); // initialCount >=0
   ~FastSemaphore();
@@ -318,10 +318,10 @@ public:
 
 class core_dll Random {
 private:
-  static int32 r250_index;
-  static int32 r521_index;
-  static uint32 r250_buffer[R250_LEN];
-  static uint32 r521_buffer[R521_LEN];
+  static int32 r250_index_;
+  static int32 r521_index_;
+  static uint32 r250_buffer_[R250_LEN];
+  static uint32 r521_buffer_[R521_LEN];
 public:
   static void Init();
 

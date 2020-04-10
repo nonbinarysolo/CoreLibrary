@@ -86,10 +86,10 @@ namespace core {
 static uint32 last_debug_oid = 0;
 #endif
 
-_Object::_Object() : refCount(0) {
+_Object::_Object() : refCount_(0) {
 #ifdef WITH_DEBUG_OID
-  _debug_oid = ++last_debug_oid;
-  if (_debug_oid == 0)
+  debug_oid_ = ++last_debug_oid;
+  if (debug_oid_ == 0)
     int set_breakpoint_here = 1;
 #endif
 }
@@ -99,12 +99,12 @@ _Object::~_Object() {
 
 void _Object::incRef() {
 
-  Atomic::Increment32(&refCount);
+  Atomic::Increment32(&refCount_);
 }
 
 void _Object::decRef() {
 
-  if (Atomic::Decrement32(&refCount) == 0)
+  if (Atomic::Decrement32(&refCount_) == 0)
     delete this;
 }
 }

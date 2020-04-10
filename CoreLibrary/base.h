@@ -94,7 +94,7 @@ class _Object;
 // Cannot be a value returned by a function (return C* instead).
 template<class C> class P {
 private:
-  _Object *object;
+  _Object *object_;
 public:
   P();
   P(C *o);
@@ -103,7 +103,7 @@ public:
   C *operator ->() const;
   template<class D> operator D *() const {
 
-    return static_cast<D *>((C *)object);
+    return static_cast<D *>((C *)object_);
   }
   bool operator ==(C *c) const;
   bool operator !=(C *c) const;
@@ -123,19 +123,19 @@ class core_dll _Object {
   friend class _P;
 protected:
 #ifdef ARCH_32
-  uint32 __vfptr_padding_Object;
+  uint32 __vfptr_padding_Object_;
 #endif
-  int32 volatile refCount;
+  int32 volatile refCount_;
   _Object();
 #ifdef WITH_DEBUG_OID
-  uint32 _debug_oid;
+  uint32 debug_oid_;
 #endif
 public:
   virtual ~_Object();
   void incRef();
   virtual void decRef();
 #ifdef WITH_DEBUG_OID
-  uint32 get_debug_oid() const { return _debug_oid; }
+  uint32 get_debug_oid() const { return debug_oid_; }
 #endif
 };
 

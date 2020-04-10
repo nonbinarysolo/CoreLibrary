@@ -97,16 +97,16 @@ template<typename T, uint32 _S> class Pipe11 :
 private:
   class Block {
   public:
-    T buffer[_S * sizeof(T)];
-    Block *next;
-    Block(Block *prev) : next(NULL) { if (prev)prev->next = this; }
-    ~Block() { if (next) delete next; }
+    T buffer_[_S * sizeof(T)];
+    Block *next_;
+    Block(Block *prev) : next_(NULL) { if (prev) prev->next_ = this; }
+    ~Block() { if (next_) delete next_; }
   };
-  int32 head;
-  int32 tail;
-  Block *first;
-  Block *last;
-  Block *spare;
+  int32 head_;
+  int32 tail_;
+  Block *first_;
+  Block *last_;
+  Block *spare_;
 protected:
   void _clear();
   T _pop();
@@ -121,7 +121,7 @@ public:
 template<typename T, uint32 _S> class Pipe1N :
   public Pipe11<T, _S> {
 private:
-  CriticalSection popCS;
+  CriticalSection popCS_;
 public:
   Pipe1N();
   ~Pipe1N();
@@ -132,7 +132,7 @@ public:
 template<typename T, uint32 _S> class PipeN1 :
   public Pipe11<T, _S> {
 private:
-  CriticalSection pushCS;
+  CriticalSection pushCS_;
 public:
   PipeN1();
   ~PipeN1();
@@ -143,8 +143,8 @@ public:
 template<typename T, uint32 _S> class PipeNN :
   public Pipe11<T, _S> {
 private:
-  CriticalSection pushCS;
-  CriticalSection popCS;
+  CriticalSection pushCS_;
+  CriticalSection popCS_;
 public:
   PipeNN();
   ~PipeNN();
@@ -182,24 +182,24 @@ template<typename T, uint32 _S, typename Head, typename Tail, class P, template<
 protected:
   class Block {
   public:
-    T buffer[_S];
-    Block *next;
-    Block(Block *prev) : next(NULL) { if (prev)prev->next = this; }
-    ~Block() { if (next) delete next; }
+    T buffer_[_S];
+    Block *next_;
+    Block(Block *prev) : next_(NULL) { if (prev) prev->next_ = this; }
+    ~Block() { if (next_) delete next_; }
   };
-  Block *first;
-  Block *last;
-  Block *spare; // pipes always retain a spare block: if a block is to be deallocated and there is no spare, it becomes the spare
+  Block *first_;
+  Block *last_;
+  Block *spare_; // pipes always retain a spare block: if a block is to be deallocated and there is no spare, it becomes the spare
 
-  Head head; // starts at -1
-  Tail tail; // starts at 0
-  int32 volatile waitingList; // amount of readers that have to wait, negative value indicate free lunch
+  Head head_; // starts at -1
+  Tail tail_; // starts at 0
+  int32 volatile waitingList_; // amount of readers that have to wait, negative value indicate free lunch
 
   Push<T, _S, P> *_push;
   Pop<T, _S, P> *_pop;
 
-  void shrink(); // deallocates the first block when head reaches its end
-  void grow(); // allocate a new last block when tail reaches its end
+  void shrink(); // deallocates the first block when head_ reaches its end
+  void grow(); // allocate a new last block when tail_ reaches its end
 
   Pipe();
 public:

@@ -77,77 +77,77 @@
 
 namespace core {
 
-template<class C> inline P<C>::P() : object(NULL) {
+template<class C> inline P<C>::P() : object_(NULL) {
 }
 
-template<class C> inline P<C>::P(C *o) : object(o) {
+template<class C> inline P<C>::P(C *o) : object_(o) {
 
-  if (object)
-    object->incRef();
+  if (object_)
+    object_->incRef();
 }
 
-template<class C> inline P<C>::P(const P<C> &p) : object(p.object) {
+template<class C> inline P<C>::P(const P<C> &p) : object_(p.object_) {
 
-  if (object)
-    object->incRef();
+  if (object_)
+    object_->incRef();
 }
 
 template<class C> inline P<C>::~P() {
 
-  if (object)
-    object->decRef();
+  if (object_)
+    object_->decRef();
 }
 
 template<class C> inline C *P<C>::operator ->() const {
 
-  return (C *)object;
+  return (C *)object_;
 }
 
 template<class C> inline bool P<C>::operator ==(C *c) const {
 
-  return object == c;
+  return object_ == c;
 }
 
 template<class C> inline bool P<C>::operator !=(C *c) const {
 
-  return object != c;
+  return object_ != c;
 }
 
 template<class C> template<class D> inline bool P<C>::operator ==(P<D> &p) const {
 
-  return object == p.object;
+  return object_ == p.object_;
 }
 
 template<class C> template<class D> inline bool P<C>::operator !=(P<D> &p) const {
 
-  return object != p.object;
+  return object_ != p.object_;
 }
 
 template<class C> inline bool P<C>::operator !() const {
 
-  return !object;
+  return !object_;
 }
 
 template<class C> inline P<C>& P<C>::operator =(C *c) {
 
-  if (object == c)
+  if (object_ == c)
     return *this;
-  if (object)
-    object->decRef();
-  if (object = c)
-    object->incRef();
+  if (object_)
+    object_->decRef();
+  if (object_ = c)
+    object_->incRef();
 
   return *this;
 }
 
 template<class C> template<class D> inline P<C> &P<C>::operator =(const P<D> &p) {
 
-  return this->operator =(static_cast<C *>((D *)p.object));
+  return this->operator =(static_cast<C *>((D *)p.object_));
 }
 
 template<class C> inline P<C> &P<C>::operator =(const P<C> &p) {
 
-  return this->operator =((C *)p.object);
+  return this->operator =((C *)p.object_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

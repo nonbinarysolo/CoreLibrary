@@ -89,9 +89,9 @@ namespace core {
 template<typename T> T SharedLibrary::getFunction(const char *functionName) {
   T function = NULL;
 #if defined WINDOWS
-  if (library) {
+  if (library_) {
 
-    function = (T)GetProcAddress(library, functionName);
+    function = (T)GetProcAddress(library_, functionName);
     if (!function) {
 
       DWORD error = GetLastError();
@@ -99,8 +99,8 @@ template<typename T> T SharedLibrary::getFunction(const char *functionName) {
     }
   }
 #elif defined LINUX
-  if (library) {
-    function = (T)dlsym(library, functionName);
+  if (library_) {
+    function = (T)dlsym(library_, functionName);
     if (!function) {
       std::cout << "> Error: unable to find symbol " << functionName << " :" << dlerror() << std::endl;
     }
@@ -115,9 +115,9 @@ template<class T> T *Thread::New(thread_function f, void *args) {
 
   T *t = new T();
 #if defined WINDOWS
-  if (t->_thread = CreateThread(NULL, 0, f, args, 0, NULL))
+  if (t->thread_ = CreateThread(NULL, 0, f, args, 0, NULL))
 #elif defined LINUX
-  if (pthread_create(&t->_thread, NULL, f, args) == 0)
+  if (pthread_create(&t->thread_, NULL, f, args) == 0)
 #endif
     return t;
   delete t;
