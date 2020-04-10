@@ -411,8 +411,7 @@ std::string Time::ToString_year(Timestamp timestamp) {
   uint64 s = ms / 1000;
   ms = ms % 1000;
 
-  time_t _gmt_time;
-  time(&_gmt_time);
+  time_t _gmt_time = s;
   struct tm   *_t = gmtime(&_gmt_time);
 
   std::string _s = asctime(_t); // _s is: Www Mmm dd hh:mm:ss yyyy but we want: Www Mmm dd yyyy hh:mm:ss:msmsms:ususus
