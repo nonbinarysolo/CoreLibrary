@@ -150,13 +150,14 @@ public:
   ~PipeNN();
   void clear();
   void push(T &t);
-  /**
-   * Pop the head item.
-   * @param waitForItem (optional) If true and the pipe is empty, block until
-   * another thread adds an item with push(). If false and the pipe is empty,
-   * return NULL immediately. If omitted, then wait for an item.
-   * @return The popped item, or NULL if waitForItem is false and the pipe is empty.
-   */
+
+  /// <summary>
+  /// Pop the head item.
+  /// </summary>
+  /// <param name="waitForItem">(optional) If true and the pipe is empty, block until
+  /// another thread adds an item with push(). If false and the pipe is empty,
+  /// return NULL immediately.If omitted, then wait for an item.</param>
+  /// <returns>The popped item, or NULL if waitForItem is false and the pipe is empty.</returns>
   T pop(bool waitForItem = true);
 };
 #elif defined PIPE_2
