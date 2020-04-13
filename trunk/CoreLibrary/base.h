@@ -31,6 +31,8 @@
 #ifndef core_base_h
 #define core_base_h
 
+//#define WITH_DEBUG_OID // Enable get_debug_oid() in every object.
+
 #include	<cstdlib>
 
 #include	"types.h"
@@ -79,10 +81,16 @@ namespace	core{
 		#endif
 		int32	volatile	refCount;
 		_Object();
+#ifdef WITH_DEBUG_OID
+		uint32 debug_oid_;
+#endif
 	public:
 		virtual	~_Object();
 		void	incRef();
 		virtual	void	decRef();
+#ifdef WITH_DEBUG_OID
+		uint32 get_debug_oid() const { return debug_oid_; }
+#endif
 	};
 
 	//	Template version of the well-known DP. Adapts C to _Object.
