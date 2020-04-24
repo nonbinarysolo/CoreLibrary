@@ -365,7 +365,10 @@ void Time::Init(uint32 r) {
   Period_ = 1000000.0 / f.QuadPart; // in us
   struct _timeb local_time;
   _ftime(&local_time);
-  InitTime_ = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
+  auto now = Timestamp(microseconds((int64)(local_time.time * 1000 + local_time.millitm) * 1000));
+  // The QueryPerformanceCounter in Get() may not start at zero, so subtract it initially.
+  InitTime_ = Timestamp(seconds(0));
+  InitTime_ = now - Get().time_since_epoch();
 #elif defined LINUX
   // The steady_clock in Get() may not start at zero, so subtract it initially.
   InitTime_ = system_clock::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
@@ -408,8 +411,7 @@ std::string Time::ToString_year(Timestamp timestamp) {
   uint64 s = ms / 1000;
   ms = ms % 1000;
 
-  time_t _gmt_time;
-  time(&_gmt_time);
+  time_t _gmt_time = s;
   struct tm   *_t = gmtime(&_gmt_time);
 
   std::string _s = asctime(_t); // _s is: Www Mmm dd hh:mm:ss yyyy but we want: Www Mmm dd yyyy hh:mm:ss:msmsms:ususus
