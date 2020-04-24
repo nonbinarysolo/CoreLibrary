@@ -83,7 +83,8 @@
 namespace core {
 
 #ifdef WITH_DEBUG_OID
-static uint32 last_debug_oid = 0;
+// Start with a non-zero value so that it doesn't appear to track object OIDs.
+static uint32 last_debug_oid = 10;
 #endif
 
 _Object::_Object() : refCount_(0) {
