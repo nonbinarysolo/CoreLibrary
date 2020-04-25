@@ -247,7 +247,7 @@ protected:
 public:
   Timer();
   ~Timer();
-  void start(std::chrono::microseconds deadline, uint32 period = 0);   // deadline in us, period in ms.
+  void start(std::chrono::microseconds deadline, std::chrono::milliseconds period = std::chrono::seconds(0));   // deadline in us, period in ms.
   bool wait(uint32 timeout = Infinite);            // timeout in ms; returns true if timedout.
 };
 

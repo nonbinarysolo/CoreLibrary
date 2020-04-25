@@ -657,11 +657,11 @@ Timer::~Timer() {
 #endif
 }
 
-void Timer::start(microseconds deadline, uint32 period) {
+void Timer::start(microseconds deadline, milliseconds period) {
 #if defined WINDOWS
   LARGE_INTEGER _deadline; // in 100 ns intervals
   _deadline.QuadPart = -10LL * deadline.count(); // negative means relative
-  bool r = SetWaitableTimer(t_, &_deadline, (long)period, NULL, NULL, 0);
+  bool r = SetWaitableTimer(t_, &_deadline, (long)period.count(), NULL, NULL, 0);
   if (!r) {
     printf("Error arming timer\n");
   }
