@@ -290,6 +290,8 @@ public:
 #endif
 };
 
+uint8 core_dll BSR(word data); // BitScanReverse
+
 class core_dll FastSemaphore : // lock-free under no contention
   public Semaphore {
 private:

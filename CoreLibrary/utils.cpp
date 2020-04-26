@@ -862,6 +862,28 @@ int64 Atomic::Swap64(int64 volatile *target, int64 v) {
 //#endif
 // }
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+
+uint8 BSR(word data) {
+#if defined WINDOWS
+#if defined ARCH_32
+  DWORD index;
+  _BitScanReverse(&index, data);
+  return (uint8)index;
+#elif defined ARCH_64
+  uint64 index;
+  _BitScanReverse64(&index, data);
+  return (uint8)index;
+#endif
+#elif defined LINUX
+#if defined ARCH_32
+  return (uint8)(31 - __builtin_clz((uint32_t)data));
+#elif defined ARCH_64
+  return (uint8)(63 - __builtin_clzll((uint64_t)data));
+#endif
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 FastSemaphore::FastSemaphore(uint32 initialCount, uint32 maxCount) : Semaphore(initialCount > 0 ? 1 : 0, 1), count_(initialCount), maxCount_(maxCount) {
