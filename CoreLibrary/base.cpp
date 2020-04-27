@@ -98,6 +98,14 @@ _Object::_Object() : refCount_(0) {
 _Object::~_Object() {
 }
 
+#ifdef WITH_DEBUG_OID
+void _Object::set_debug_oid(uint32 debug_oid) {
+  debug_oid_ = debug_oid;
+  // Make sure the next assigned debug OID is higher.
+  last_debug_oid = debug_oid;
+}
+#endif
+
 void _Object::incRef() {
 
   Atomic::Increment32(&refCount_);

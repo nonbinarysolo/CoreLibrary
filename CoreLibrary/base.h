@@ -136,6 +136,13 @@ public:
   virtual void decRef();
 #ifdef WITH_DEBUG_OID
   uint32 get_debug_oid() const { return debug_oid_; }
+
+  /// <summary>
+  /// Set this object's debug OID and also set the static last_debug_oid
+  /// so that the next debug OID will be higher than this one.
+  /// </summary>
+  /// <param name="debug_oid">The debug OID.</param>
+  void set_debug_oid(uint32 debug_oid);
 #endif
 };
 
