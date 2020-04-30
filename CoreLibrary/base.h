@@ -78,7 +78,7 @@
 #ifndef core_base_h
 #define core_base_h
 
-//#define WITH_DEBUG_OID // Enable get_debug_oid() in every object.
+#define WITH_DEBUG_OID // Enable get_debug_oid() in every object.
 
 #include <cstdlib>
 
@@ -137,11 +137,11 @@ public:
 #ifdef WITH_DEBUG_OID
   uint32 get_debug_oid() const { return debug_oid_; }
 
-  /// <summary>
-  /// Set this object's debug OID and also set the static last_debug_oid
-  /// so that the next debug OID will be higher than this one.
-  /// </summary>
-  /// <param name="debug_oid">The debug OID.</param>
+  /**
+   * Set this object's debug OID and also set the static last_debug_oid
+   * so that the next debug OID will be higher than this one.
+   * \param debug_oid The debug OID.
+   */
   void set_debug_oid(uint32 debug_oid);
 #endif
 };
