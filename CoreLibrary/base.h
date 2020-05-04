@@ -128,21 +128,21 @@ protected:
   int32 volatile refCount_;
   _Object();
 #ifdef WITH_DEBUG_OID
-  uint32 debug_oid_;
+  uint64 debug_oid_;
 #endif
 public:
   virtual ~_Object();
   void incRef();
   virtual void decRef();
 #ifdef WITH_DEBUG_OID
-  uint32 get_debug_oid() const { return debug_oid_; }
+  uint64 get_debug_oid() const { return debug_oid_; }
 
   /**
    * Set this object's debug OID and also set the static last_debug_oid
    * so that the next debug OID will be higher than this one.
    * \param debug_oid The debug OID.
    */
-  void set_debug_oid(uint32 debug_oid);
+  void set_debug_oid(uint64 debug_oid);
 #endif
 };
 
