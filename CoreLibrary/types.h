@@ -81,12 +81,13 @@
 #include <cstddef>
 #include <chrono>
 
-#if defined(WIN32)
-#define WINDOWS
-#define ARCH_32
-#elif defined(WIN64)
+// Check for WIN64 first because in 64-bit Windows, WIN32 is also defined.
+#if defined(WIN64)
 #define WINDOWS
 #define ARCH_64
+#elif defined(WIN32)
+#define WINDOWS
+#define ARCH_32
 #elif defined(__GNUC__)
 
 #if __GNUC__ == 4
