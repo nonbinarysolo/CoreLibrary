@@ -73,6 +73,7 @@
 #ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
+#include "types.h"
 #include "xml_parser.h"
 #ifdef _XMLWINDOWS
 //#ifdef _DEBUG
