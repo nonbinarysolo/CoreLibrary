@@ -871,7 +871,7 @@ uint8 BSR(word data) {
   _BitScanReverse(&index, data);
   return (uint8)index;
 #elif defined ARCH_64
-  uint64 index;
+  DWORD index;
   _BitScanReverse64(&index, data);
   return (uint8)index;
 #endif
