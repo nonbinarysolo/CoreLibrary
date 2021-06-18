@@ -78,7 +78,7 @@
 #ifndef core_base_h
 #define core_base_h
 
-//#define WITH_DEBUG_OID // Enable get_debug_oid() in every object.
+//#define WITH_DETAIL_OID // Enable get_detail_oid() in every object.
 
 #include <cstdlib>
 
@@ -127,22 +127,22 @@ protected:
 #endif
   int32 volatile refCount_;
   _Object();
-#ifdef WITH_DEBUG_OID
-  uint64 debug_oid_;
+#ifdef WITH_DETAIL_OID
+  uint64 detail_oid_;
 #endif
 public:
   virtual ~_Object();
   void incRef();
   virtual void decRef();
-#ifdef WITH_DEBUG_OID
-  uint64 get_debug_oid() const { return debug_oid_; }
+#ifdef WITH_DETAIL_OID
+  uint64 get_detail_oid() const { return detail_oid_; }
 
   /**
-   * Set this object's debug OID and also set the static last_debug_oid
-   * so that the next debug OID will be higher than this one.
-   * \param debug_oid The debug OID.
+   * Set this object's detail OID and also set the static last_detail_oid
+   * so that the next detail OID will be higher than this one.
+   * \param detail_oid The detail OID.
    */
-  void set_debug_oid(uint64 debug_oid);
+  void set_detail_oid(uint64 detail_oid);
 #endif
 };
 
