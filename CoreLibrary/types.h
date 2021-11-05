@@ -115,14 +115,6 @@
 #include <winsock2.h>
 #endif
 
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
-#define UNORDERED_MAP std::tr1::unordered_map
-#define UNORDERED_SET std::tr1::unordered_set
-#define UNORDERED_MULTIMAP std::tr1::unordered_multimap
-#define UNORDERED_MULTISET std::tr1::unordered_multiset
-
 #if defined CORELIBRARY_EXPORTS
 #define core_dll __declspec(dllexport)
 #else
@@ -152,14 +144,6 @@
 #include <semaphore.h>
 #include <signal.h>
 #include <limits.h>
-
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#define UNORDERED_MAP std::unordered_map
-#define UNORDERED_SET std::unordered_set
-#define UNORDERED_MULTIMAP std::unordered_multimap
-#define UNORDERED_MULTISET std::unordered_multiset
 
 #define dll_export __attribute((visibility("default")))
 #define dll_import __attribute((visibility("default")))
