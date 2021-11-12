@@ -3,12 +3,12 @@
 //_/_/ AERA
 //_/_/ Autocatalytic Endogenous Reflective Architecture
 //_/_/ 
-//_/_/ Copyright (c) 2021 Jeff Thompson
-//_/_/ Copyright (c) 2021 Kristinn R. Thorisson
-//_/_/ Copyright (c) 2021 Icelandic Institute for Intelligent Machines
+//_/_/ Copyright (c) 2018-2021 Jeff Thompson
+//_/_/ Copyright (c) 2018-2021 Kristinn R. Thorisson
+//_/_/ Copyright (c) 2018-2021 Icelandic Institute for Intelligent Machines
 //_/_/ http://www.iiim.is
 //_/_/ 
-//_/_/ Copyright (c) 2012 Eric Nivel, Thor List
+//_/_/ Copyright (c) 2010-2012 Eric Nivel, Thor List
 //_/_/ Center for Analysis and Design of Intelligent Agents
 //_/_/ Reykjavik University, Menntavegur 1, 102 Reykjavik, Iceland
 //_/_/ http://cadia.ru.is
