@@ -393,25 +393,29 @@ Timestamp Time::Get() {
 }
 
 std::string Time::ToString_seconds(Timestamp::duration duration) {
-  uint64 t = duration_cast<microseconds>(duration).count();
+  uint64 t = abs(duration_cast<microseconds>(duration).count());
 
   uint64 us = t % 1000;
   uint64 ms = t / 1000;
   uint64 s = ms / 1000;
   ms = ms % 1000;
 
-  std::string _s = std::to_string(s);
-  _s += "s:";
-  _s += std::to_string(ms);
-  _s += "ms:";
-  _s += std::to_string(us);
-  _s += "us";
+  std::string result;
+  if (duration < seconds(0))
+    result += "-";
+  result += std::to_string(s);
+  result += "s:";
+  result += std::to_string(ms);
+  result += "ms:";
+  result += std::to_string(us);
+  result += "us";
 
-  return _s;
+  return result;
 }
 
 std::string Time::ToString_year(Timestamp timestamp) {
-  uint64 t = duration_cast<microseconds>(timestamp.time_since_epoch()).count();
+  // For now, assume all times are after the epoch. Take the absolute value to be sure.
+  uint64 t = abs(duration_cast<microseconds>(timestamp.time_since_epoch()).count());
 
   uint64 us = t % 1000;
   uint64 ms = t / 1000;
