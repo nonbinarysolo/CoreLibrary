@@ -115,6 +115,8 @@ public:
   bool operator ==(C *c) const;
   bool operator !=(C *c) const;
   bool operator !() const;
+  bool operator <(P<C> &p) const       { return (size_t)object_ < (size_t)p.object_; }
+  bool operator <(const P<C> &p) const { return (size_t)object_ < (size_t)p.object_; }
   template<class D> bool operator ==(P<D> &p) const;
   template<class D> bool operator !=(P<D> &p) const;
   P<C> &operator =(C *c);
