@@ -141,7 +141,8 @@ template<class C> inline P<C>& P<C>::operator =(C *c) {
     return *this;
   if (object_)
     object_->decRef();
-  if (object_ = c)
+  object_ = c;
+  if (object_)
     object_->incRef();
 
   return *this;
