@@ -392,26 +392,6 @@ Timestamp Time::Get() {
 #endif
 }
 
-std::string Time::ToString_seconds(Timestamp::duration duration) {
-  // The compiler doesn't support negative times. Assume durations are positive. Take the absolute value to be sure.
-  uint64 t = abs(duration_cast<microseconds>(duration).count());
-
-  uint64 us = t % 1000;
-  uint64 ms = t / 1000;
-  uint64 s = ms / 1000;
-  ms = ms % 1000;
-
-  std::string result;
-  result += std::to_string(s);
-  result += "s:";
-  result += std::to_string(ms);
-  result += "ms:";
-  result += std::to_string(us);
-  result += "us";
-
-  return result;
-}
-
 std::string Time::ToString_year(Timestamp timestamp) {
   // For now, assume all times are after the epoch. Take the absolute value to be sure.
   uint64 t = abs(duration_cast<microseconds>(timestamp.time_since_epoch()).count());

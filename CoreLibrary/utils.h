@@ -196,7 +196,6 @@ public:
   static void Init(uint32 r); // detects the hardware timing capabilities; r: time resolution in us (on windows xp: max ~1000; use 1000, 2000, 5000 or 10000)
   static Timestamp Get();     // timestamp since 01/01/1970
 
-  static std::string ToString_seconds(Timestamp::duration duration); // seconds:milliseconds:microseconds.
   static std::string ToString_year(Timestamp timestamp);    // day_name day_number month year hour:minutes:seconds:milliseconds:microseconds GMT since 01/01/1970.
 };
 
