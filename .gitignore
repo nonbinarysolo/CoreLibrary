@@ -3,3 +3,16 @@
 
 # Debug folders
 */Debug/*
+
+# Build output files
+*.log
+*.tlog
+*.obj
+*.pdb
+*.idb
+
+# Others
+.vs/*
+*.user
+*.txt
+
