@@ -149,11 +149,10 @@ class core_dll SharedLibrary {
 private:
   shared_object library_;
 public:
-  static SharedLibrary *New(const char *fileName);
   SharedLibrary();
   ~SharedLibrary();
   SharedLibrary *load(const char *fileName);
-  template<typename T> T getFunction(const char *functionName);
+  void* getFunction(const char *functionName);
 };
 
 class core_dll Thread {

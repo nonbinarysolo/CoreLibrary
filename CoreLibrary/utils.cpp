@@ -150,18 +150,6 @@ void Error::PrintBinary(void* p, uint32 size, bool asInt, const char* title) {
   printf("\n");
 }
 
-SharedLibrary *SharedLibrary::New(const char *fileName) {
-
-  SharedLibrary *sl = new SharedLibrary();
-  if (sl->load(fileName))
-    return sl;
-  else {
-
-    delete sl;
-    return NULL;
-  }
-}
-
 SharedLibrary::SharedLibrary() : library_(NULL) {
 }
 
@@ -207,6 +195,30 @@ SharedLibrary *SharedLibrary::load(const char *fileName) {
   free(libraryName);
 #endif
   return this;
+}
+
+
+void* SharedLibrary::getFunction(const char* functionName) {
+  void* function = NULL;
+#if defined WINDOWS
+  if (library_) {
+
+    function = GetProcAddress(library_, functionName);
+    if (!function) {
+
+      DWORD error = GetLastError();
+      std::cerr << "GetProcAddress > Error: " << error << std::endl;
+    }
+  }
+#elif defined LINUX
+  if (library_) {
+    function = dlsym(library_, functionName);
+    if (!function) {
+      std::cout << "> Error: unable to find symbol " << functionName << " :" << dlerror() << std::endl;
+    }
+  }
+#endif
+  return function;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

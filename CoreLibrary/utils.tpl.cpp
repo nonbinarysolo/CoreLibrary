@@ -93,31 +93,6 @@
 
 namespace core {
 
-template<typename T> T SharedLibrary::getFunction(const char *functionName) {
-  T function = NULL;
-#if defined WINDOWS
-  if (library_) {
-
-    function = (T)GetProcAddress(library_, functionName);
-    if (!function) {
-
-      DWORD error = GetLastError();
-      std::cerr << "GetProcAddress > Error: " << error << std::endl;
-    }
-  }
-#elif defined LINUX
-  if (library_) {
-    function = (T)dlsym(library_, functionName);
-    if (!function) {
-      std::cout << "> Error: unable to find symbol " << functionName << " :" << dlerror() << std::endl;
-    }
-  }
-#endif
-  return function;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
 template<class T> T *Thread::New(thread_function f, void *args) {
 
   T *t = new T();
