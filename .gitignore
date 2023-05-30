@@ -1,5 +1,7 @@
-# Release folders
+# Build folders
 */Release/*
+*/x64/*
+*/Debug/*
 
 # Debug folders
 */Debug/*
