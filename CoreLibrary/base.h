@@ -85,7 +85,7 @@
 #ifndef core_base_h
 #define core_base_h
 
-//#define WITH_DETAIL_OID // Enable get_detail_oid() in every object.
+#define WITH_DETAIL_OID // Enable get_detail_oid() in every object.
 
 #include <cstdlib>
 
