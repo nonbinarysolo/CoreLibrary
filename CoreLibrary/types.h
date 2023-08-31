@@ -186,8 +186,25 @@ typedef double float64;
 typedef word32 word;
 typedef word16 half_word;
 
-// Even though Time::Get() uses a "steady clock", it returns the time since 01/01/1970, so use system_clock.
-typedef std::chrono::system_clock::time_point Timestamp;
+// Like std::system_clock, but period is 1 microsecond (not 100 nanoseconds).
+struct system_clock_us
+{
+	using rep = long long;
+
+	using period = std::micro;
+
+	using duration = std::chrono::duration<rep, period>;
+	using time_point = std::chrono::time_point<system_clock_us>;
+	static constexpr bool is_steady = false;
+
+  static time_point now() noexcept
+	{	// get current time
+		return time_point(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()));
+	}
+};
+
+// Even though Time::Get() uses a "steady clock", it returns the time since 01/01/1970, so use system_clock_us.
+typedef system_clock_us::time_point Timestamp;
 
 #if defined WINDOWS
 typedef long int32;
