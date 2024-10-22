@@ -268,7 +268,7 @@ void Thread::Sleep(milliseconds ms) {
   ::Sleep((uint32)ms.count());
 #elif defined LINUX
   // we are actually being passed millisecond, so multiply up
-  usleep(ms * 1000);
+  usleep(ms.count() * 1000);
 #endif
 }
 
@@ -549,7 +549,7 @@ bool Mutex::acquire(uint32 timeout) {
   uint32 r = WaitForSingleObject(m_, timeout);
   return r == WAIT_TIMEOUT;
 #elif defined LINUX
-  int64 start = Time::Get();
+  int64 start = duration_cast<milliseconds>(Time::Get().time_since_epoch()).count();
   int64 uTimeout = timeout * 1000;
 
   while (pthread_mutex_trylock(&m_) != 0) {
