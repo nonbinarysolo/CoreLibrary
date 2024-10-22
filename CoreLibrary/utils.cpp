@@ -576,7 +576,7 @@ CriticalSection::CriticalSection() {
 #if defined WINDOWS
   InitializeCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_init(&CS, NULL);
+  pthread_mutex_init(&cs_, NULL);
 #endif
 }
 
@@ -584,7 +584,7 @@ CriticalSection::~CriticalSection() {
 #if defined WINDOWS
   DeleteCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_destroy(&CS);
+  pthread_mutex_destroy(&cs_);
 #endif
 }
 
@@ -592,7 +592,7 @@ void CriticalSection::enter() {
 #if defined WINDOWS
   EnterCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_lock(&CS);
+  pthread_mutex_lock(&cs_);
 #endif
 }
 
@@ -600,7 +600,7 @@ void CriticalSection::leave() {
 #if defined WINDOWS
   LeaveCriticalSection(&cs_);
 #elif defined LINUX
-  pthread_mutex_unlock(&CS);
+  pthread_mutex_unlock(&cs_);
 #endif
 }
 
