@@ -549,11 +549,11 @@ bool Mutex::acquire(uint32 timeout) {
   uint32 r = WaitForSingleObject(m_, timeout);
   return r == WAIT_TIMEOUT;
 #elif defined LINUX
-  int64 start = duration_cast<milliseconds>(Time::Get().time_since_epoch()).count();
-  int64 uTimeout = timeout * 1000;
+  auto start = Time::Get();
+  auto uTimeout = microseconds(timeout * 1000);
 
   while (pthread_mutex_trylock(&m_) != 0) {
-    Thread::Sleep(10);
+    Thread::Sleep(milliseconds(10));
     if (Time::Get() - start >= uTimeout)
       return false;
   }
