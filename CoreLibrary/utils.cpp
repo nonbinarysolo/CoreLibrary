@@ -282,7 +282,7 @@ void Thread::Sleep() {
 }
 
 Thread::Thread() : is_meaningful_(false) {
-  thread_ = NULL;
+  thread_ = 0;
 }
 
 Thread::~Thread() {
