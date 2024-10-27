@@ -88,6 +88,7 @@
 //#define WITH_DETAIL_OID // Enable get_detail_oid() in every object.
 
 #include <cstdlib>
+#include <atomic>
 
 #include "types.h"
 
@@ -134,7 +135,7 @@ protected:
 #ifdef ARCH_32
   uint32 __vfptr_padding_Object_;
 #endif
-  int32 volatile refCount_;
+  std::atomic_int32_t refCount_;
   _Object();
 #ifdef WITH_DETAIL_OID
   uint64 detail_oid_;
