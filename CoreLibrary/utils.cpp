@@ -672,7 +672,7 @@ void Timer::start(microseconds deadline, milliseconds period) {
   sigset_t allsigs;
 
   uint64 t = deadline.count();
-  uint64 p = period_ * 1000;
+  uint64 p = period.count() * 1000;
   newtv.it_interval.tv_sec = p / 1000000;
   newtv.it_interval.tv_nsec = (p % 1000000) * 1000;
   newtv.it_value.tv_sec = t / 1000000;
