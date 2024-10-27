@@ -390,7 +390,7 @@ void Time::Init(uint32 r) {
   InitTime_ = now - Get().time_since_epoch();
 #elif defined LINUX
   // The steady_clock in Get() may not start at zero, so subtract it initially.
-  InitTime_ = system_clock::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
+  InitTime_ = system_clock_us::now() - duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 #endif
 }
 
