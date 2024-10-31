@@ -118,12 +118,12 @@ void _Object::set_detail_oid(uint64 detail_oid) {
 
 void _Object::incRef() {
 
-  Atomic::Increment32(&refCount_);
+  ++refCount_;
 }
 
 void _Object::decRef() {
 
-  if (Atomic::Decrement32(&refCount_) == 0)
+  if (--refCount_ == 0)
     delete this;
 }
 }
